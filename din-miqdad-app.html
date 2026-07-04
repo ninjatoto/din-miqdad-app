@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دين مقداد - إدارة المال</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #1a5f7a;
+            --secondary: #57c5b6;
+            --accent: #159895;
+            --danger: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --bg: #f0f4f8;
+            --card-bg: #ffffff;
+            --text: #2c3e50;
+            --text-light: #7f8c8d;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text);
+        }
+
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: var(--bg);
+            position: relative;
+            box-shadow: 0 0 40px rgba(0,0,0,0.3);
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            padding: 20px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .app-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .menu-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .menu-btn:hover { background: rgba(255,255,255,0.3); }
+
+        /* Balance Card */
+        .balance-section {
+            padding: 0 20px;
+            margin-top: -30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .main-balance-card {
+            background: linear-gradient(135deg, #1a5f7a 0%, #159895 100%);
+            border-radius: 24px;
+            padding: 28px;
+            color: white;
+            box-shadow: 0 15px 35px rgba(26, 95, 122, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-balance-card::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: -30px;
+            width: 120px;
+            height: 120px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+
+        .balance-label {
+            font-size: 0.9rem;
+            opacity: 0.85;
+            margin-bottom: 8px;
+        }
+
+        .balance-amount {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .balance-currency {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 20px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 60px;
+            height: 60px;
+            border-radius: 0 0 0 60px;
+            opacity: 0.1;
+        }
+
+        .stat-card.income::before { background: var(--success); }
+        .stat-card.expense::before { background: var(--danger); }
+        .stat-card.month-balance::before { background: var(--warning); }
+        .stat-card.savings::before { background: var(--primary); }
+
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+        }
+
+        .income .stat-icon { background: rgba(39, 174, 96, 0.15); color: var(--success); }
+        .expense .stat-icon { background: rgba(231, 76, 60, 0.15); color: var(--danger); }
+        .month-balance .stat-icon { background: rgba(243, 156, 18, 0.15); color: var(--warning); }
+        .savings .stat-icon { background: rgba(26, 95, 122, 0.15); color: var(--primary); }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .income .stat-value { color: var(--success); }
+        .expense .stat-value { color: var(--danger); }
+        .month-balance .stat-value { color: var(--warning); }
+        .savings .stat-value { color: var(--primary); }
+
+        /* Action Buttons */
+        .actions-section {
+            padding: 0 20px 20px;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .action-btn {
+            border: none;
+            border-radius: 20px;
+            padding: 18px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .action-btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .action-btn.add-income {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            box-shadow: 0 8px 20px rgba(39, 174, 96, 0.3);
+        }
+
+        .action-btn.add-expense {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3);
+        }
+
+        .action-btn.reports {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3);
+        }
+
+        .action-btn.settings {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+            box-shadow: 0 8px 20px rgba(155, 89, 182, 0.3);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+        }
+
+        .action-btn i {
+            font-size: 1.6rem;
+        }
+
+        /* Recent Transactions */
+        .transactions-section {
+            padding: 0 20px 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .view-all {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .transaction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .transaction-item {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            transition: transform 0.2s;
+        }
+
+        .transaction-item:hover {
+            transform: translateX(-4px);
+        }
+
+        .transaction-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .transaction-icon.income {
+            background: rgba(39, 174, 96, 0.12);
+            color: var(--success);
+        }
+
+        .transaction-icon.expense {
+            background: rgba(231, 76, 60, 0.12);
+            color: var(--danger);
+        }
+
+        .transaction-info {
+            flex: 1;
+        }
+
+        .transaction-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .transaction-date {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .transaction-amount {
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .transaction-amount.income { color: var(--success); }
+        .transaction-amount.expense { color: var(--danger); }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0 20px;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.08);
+            border-radius: 24px 24px 0 0;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            color: var(--text-light);
+            font-size: 0.7rem;
+            font-weight: 600;
+            transition: color 0.3s;
+            padding: 4px 16px;
+            border-radius: 12px;
+        }
+
+        .nav-item.active { color: var(--primary); }
+        .nav-item:hover { color: var(--primary); }
+
+        .nav-item i { font-size: 1.3rem; }
+
+        .nav-item.active {
+            background: rgba(26, 95, 122, 0.08);
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(26, 95, 122, 0.4);
+            transition: all 0.3s;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fab:hover {
+            transform: translateX(-50%) scale(1.1);
+            box-shadow: 0 12px 35px rgba(26, 95, 122, 0.5);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: flex-end;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 480px;
+            border-radius: 30px 30px 0 0;
+            padding: 24px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: var(--bg);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--text);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e8ecf1;
+            border-radius: 16px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            background: var(--bg);
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .type-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .type-option {
+            flex: 1;
+            padding: 14px;
+            border: 2px solid #e8ecf1;
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .type-option.selected {
+            border-color: var(--success);
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--success);
+        }
+
+        .type-option.expense-option.selected {
+            border-color: var(--danger);
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--danger);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            font-family: inherit;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 8px;
+        }
+
+        .submit-btn.income-btn {
+            background: linear-gradient(135deg, var(--success), #2ecc71);
+        }
+
+        .submit-btn.expense-btn {
+            background: linear-gradient(135deg, var(--danger), #c0392b);
+        }
+
+        .submit-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+
+        /* Chart Section */
+        .chart-section {
+            padding: 0 20px 20px;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+
+        .chart-container {
+            height: 180px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            gap: 8px;
+            padding-top: 20px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(to top, var(--primary), var(--secondary));
+            border-radius: 8px 8px 0 0;
+            min-height: 20px;
+            position: relative;
+            transition: all 0.5s;
+        }
+
+        .chart-bar::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: var(--text-light);
+            white-space: nowrap;
+        }
+
+        .chart-bar::before {
+            content: attr(data-value);
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        /* Scroll padding for bottom nav */
+        .content { padding-bottom: 100px; }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .app-container { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-top">
+                <button class="menu-btn"><i class="fas fa-bars"></i></button>
+                <h1 class="app-title">💰 دين مقداد</h1>
+                <button class="menu-btn"><i class="fas fa-bell"></i></button>
+            </div>
+        </header>
+
+        <div class="content">
+            <!-- Main Balance -->
+            <div class="balance-section">
+                <div class="main-balance-card">
+                    <div class="balance-label">الرصيد الكلي</div>
+                    <div class="balance-amount" id="totalBalance">0.00</div>
+                    <div class="balance-currency">ر.س</div>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card income">
+                    <div class="stat-icon"><i class="fas fa-arrow-down"></i></div>
+                    <div class="stat-label">دخل الشهر</div>
+                    <div class="stat-value" id="monthIncome">0.00</div>
+                </div>
+                <div class="stat-card expense">
+                    <div class="stat-icon"><i class="fas fa-arrow-up"></i></div>
+                    <div class="stat-label">مصروفات الشهر</div>
+                    <div class="stat-value" id="monthExpense">0.00</div>
+                </div>
+                <div class="stat-card month-balance">
+                    <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+                    <div class="stat-label">رصيد الشهر</div>
+                    <div class="stat-value" id="monthBalance">0.00</div>
+                </div>
+                <div class="stat-card savings">
+                    <div class="stat-icon"><i class="fas fa-piggy-bank"></i></div>
+                    <div class="stat-label">نسبة الادخار</div>
+                    <div class="stat-value" id="savingsRate">0%</div>
+                </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="chart-section">
+                <div class="chart-card">
+                    <div class="section-header">
+                        <h3 class="section-title">📊 تحليل الشهر</h3>
+                    </div>
+                    <div class="chart-container" id="chartContainer">
+                        <div class="chart-bar" style="height: 60%;" data-label="أسبوع 1" data-value="1500"></div>
+                        <div class="chart-bar" style="height: 80%;" data-label="أسبوع 2" data-value="2000"></div>
+                        <div class="chart-bar" style="height: 45%;" data-label="أسبوع 3" data-value="900"></div>
+                        <div class="chart-bar" style="height: 70%;" data-label="أسبوع 4" data-value="1800"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="actions-section">
+                <div class="actions-grid">
+                    <button class="action-btn add-income" onclick="openModal('income')">
+                        <i class="fas fa-plus-circle"></i>
+                        إضافة دخل
+                    </button>
+                    <button class="action-btn add-expense" onclick="openModal('expense')">
+                        <i class="fas fa-minus-circle"></i>
+                        إضافة مصروف
+                    </button>
+                    <button class="action-btn reports" onclick="showReports()">
+                        <i class="fas fa-chart-pie"></i>
+                        التقارير
+                    </button>
+                    <button class="action-btn settings" onclick="showSettings()">
+                        <i class="fas fa-cog"></i>
+                        الإعدادات
+                    </button>
+                </div>
+            </div>
+
+            <!-- Recent Transactions -->
+            <div class="transactions-section">
+                <div class="section-header">
+                    <h3 class="section-title">📝 آخر المعاملات</h3>
+                    <a href="#" class="view-all">عرض الكل</a>
+                </div>
+                <div class="transaction-list" id="transactionList">
+                    <div class="transaction-item">
+                        <div class="transaction-icon income"><i class="fas fa-briefcase"></i></div>
+                        <div class="transaction-info">
+                            <div class="transaction-title">راتب الشهر</div>
+                            <div class="transaction-date">1 يوليو 2026</div>
+                        </div>
+                        <div class="transaction-amount income">+5,000 ر.س</div>
+                    </div>
+                    <div class="transaction-item">
+                        <div class="transaction-icon expense"><i class="fas fa-shopping-cart"></i></div>
+                        <div class="transaction-info">
+                            <div class="transaction-title">تسوق سوبرماركت</div>
+                            <div class="transaction-date">2 يوليو 2026</div>
+                        </div>
+                        <div class="transaction-amount expense">-450 ر.س</div>
+                    </div>
+                    <div class="transaction-item">
+                        <div class="transaction-icon expense"><i class="fas fa-car"></i></div>
+                        <div class="transaction-info">
+                            <div class="transaction-title">بنزين السيارة</div>
+                            <div class="transaction-date">3 يوليو 2026</div>
+                        </div>
+                        <div class="transaction-amount expense">-200 ر.س</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Action Button -->
+        <button class="fab" onclick="openModal('income')">
+            <i class="fas fa-plus"></i>
+        </button>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active">
+                <i class="fas fa-home"></i>
+                الرئيسية
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-chart-bar"></i>
+                التقارير
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-list"></i>
+                المعاملات
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-user"></i>
+                حسابي
+            </a>
+        </nav>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">إضافة معاملة</h2>
+                <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="type-selector">
+                <div class="type-option selected" onclick="selectType('income', this)">
+                    <i class="fas fa-arrow-down"></i> دخل
+                </div>
+                <div class="type-option expense-option" onclick="selectType('expense', this)">
+                    <i class="fas fa-arrow-up"></i> مصروف
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">المبلغ</label>
+                <input type="number" class="form-input" id="amountInput" placeholder="0.00">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">الوصف</label>
+                <input type="text" class="form-input" id="descInput" placeholder="مثال: راتب، فاتورة كهرباء...">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">التصنيف</label>
+                <select class="form-select" id="categoryInput">
+                    <option value="salary">راتب</option>
+                    <option value="bonus">مكافأة</option>
+                    <option value="investment">استثمار</option>
+                    <option value="other">أخرى</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">التاريخ</label>
+                <input type="date" class="form-input" id="dateInput">
+            </div>
+
+            <button class="submit-btn income-btn" id="submitBtn" onclick="submitTransaction()">
+                <i class="fas fa-check"></i> إضافة
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let currentType = 'income';
+        let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('dateInput').valueAsDate = new Date();
+            updateDashboard();
+        });
+
+        function openModal(type) {
+            currentType = type;
+            document.getElementById('modalOverlay').classList.add('active');
+            document.getElementById('modalTitle').textContent = type === 'income' ? 'إضافة دخل' : 'إضافة مصروف';
+
+            const options = document.querySelectorAll('.type-option');
+            options[0].classList.toggle('selected', type === 'income');
+            options[1].classList.toggle('selected', type === 'expense');
+
+            updateSubmitBtn();
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            document.getElementById('amountInput').value = '';
+            document.getElementById('descInput').value = '';
+        }
+
+        function selectType(type, element) {
+            currentType = type;
+            document.querySelectorAll('.type-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            updateSubmitBtn();
+        }
+
+        function updateSubmitBtn() {
+            const btn = document.getElementById('submitBtn');
+            btn.className = currentType === 'income' ? 'submit-btn income-btn' : 'submit-btn expense-btn';
+            btn.innerHTML = currentType === 'income' ? '<i class="fas fa-check"></i> إضافة دخل' : '<i class="fas fa-check"></i> إضافة مصروف';
+        }
+
+        function submitTransaction() {
+            const amount = parseFloat(document.getElementById('amountInput').value);
+            const desc = document.getElementById('descInput').value;
+            const category = document.getElementById('categoryInput').value;
+            const date = document.getElementById('dateInput').value;
+
+            if (!amount || amount <= 0) {
+                alert('الرجاء إدخال مبلغ صحيح');
+                return;
+            }
+
+            const transaction = {
+                id: Date.now(),
+                type: currentType,
+                amount: amount,
+                description: desc || 'معاملة',
+                category: category,
+                date: date,
+                timestamp: new Date().toISOString()
+            };
+
+            transactions.push(transaction);
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+
+            addTransactionToUI(transaction);
+            updateDashboard();
+            closeModal();
+        }
+
+        function addTransactionToUI(transaction) {
+            const list = document.getElementById('transactionList');
+            const item = document.createElement('div');
+            item.className = 'transaction-item';
+            item.innerHTML = `
+                <div class="transaction-icon ${transaction.type}">
+                    <i class="fas ${transaction.type === 'income' ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
+                </div>
+                <div class="transaction-info">
+                    <div class="transaction-title">${transaction.description}</div>
+                    <div class="transaction-date">${transaction.date}</div>
+                </div>
+                <div class="transaction-amount ${transaction.type}">
+                    ${transaction.type === 'income' ? '+' : '-'}${transaction.amount.toFixed(2)} ر.س
+                </div>
+            `;
+            list.insertBefore(item, list.firstChild);
+        }
+
+        function updateDashboard() {
+            const income = transactions
+                .filter(t => t.type === 'income')
+                .reduce((sum, t) => sum + t.amount, 0);
+
+            const expense = transactions
+                .filter(t => t.type === 'expense')
+                .reduce((sum, t) => sum + t.amount, 0);
+
+            const balance = income - expense;
+            const savingsRate = income > 0 ? ((income - expense) / income * 100).toFixed(1) : 0;
+
+            document.getElementById('totalBalance').textContent = balance.toFixed(2);
+            document.getElementById('monthIncome').textContent = income.toFixed(2);
+            document.getElementById('monthExpense').textContent = expense.toFixed(2);
+            document.getElementById('monthBalance').textContent = balance.toFixed(2);
+            document.getElementById('savingsRate').textContent = savingsRate + '%';
+        }
+
+        function showReports() {
+            alert('سيتم فتح صفحة التقارير التفصيلية');
+        }
+
+        function showSettings() {
+            alert('سيتم فتح صفحة الإعدادات');
+        }
+
+        // Close modal on outside click
+        document.getElementById('modalOverlay').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('modalOverlay')) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
